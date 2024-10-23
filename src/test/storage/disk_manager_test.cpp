@@ -67,7 +67,7 @@ TEST_F(DiskManagerTest, FileOperation) {
         // 清理残留文件
         if (disk_manager_->is_file(filename)) {
             disk_manager_->destroy_file(filename);
-        }
+        }     
         // 测试异常：如果没有创建文件就打开文件
         try {
             disk_manager_->open_file(filename);
