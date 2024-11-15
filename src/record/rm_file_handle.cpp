@@ -73,7 +73,8 @@ void RmFileHandle::update_record(const Rid& rid, char* buf, Context* context) {
     // Todo:
     // 1. 获取指定记录所在的page handle
     // 2. 更新记录
-
+    RmPageHandle page_handle = fetch_page_handle(rid.page_no);
+    strcpy(page_handle.page->get_data() , buf);
 }
 
 /**
@@ -118,7 +119,14 @@ RmPageHandle RmFileHandle::create_page_handle() {
     //     1.2 有空闲页：直接获取第一个空闲页
     // 2. 生成page handle并返回给上层
 
-    return RmPageHandle(&file_hdr_, nullptr);
+    page_id_t page_no = file_hdr_.first_free_page_no;
+    if (page_no == -1) {
+        return create_new_page_handle();
+    }
+    else {
+        return fetch_page_handle(page_no);
+    }
+    
 }
 
 /**
@@ -130,4 +138,6 @@ void RmFileHandle::release_page_handle(RmPageHandle&page_handle) {
     // 1. page_handle.page_hdr->next_free_page_no
     // 2. file_hdr_.first_free_page_no
     
+    page_handle.page_hdr->next_free_page_no = file_hdr_.first_free_page_no;
+    file_hdr_.first_free_page_no = page_handle.page->get_page_id().page_no;
 }
